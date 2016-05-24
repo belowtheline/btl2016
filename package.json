@@ -1,0 +1,26 @@
+{
+  "name": "belowtheline",
+  "version": "2016.0.0",
+  "description": "Below The Line",
+  "dependencies": {
+    "babel-brunch": "^6.0.4",
+    "babel-cli": "^6.9.0",
+    "babel-plugin-syntax-class-properties": "^6.8.0",
+    "babel-plugin-transform-class-properties": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "brunch": "^2.8.0",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "react-redux": "^4.4.5",
+    "redux": "^3.5.2"
+  },
+  "scripts": {
+    "build": "brunch build",
+    "watch": "brunch watch",
+    "serve": "brunch watch --server"
+  },
+  "author": "Benno Rice <benno@jeamland.net>",
+  "license": "BSD-2-Clause",
+  "repository": "https://github.com/belowtheline/btl2016"
+}
