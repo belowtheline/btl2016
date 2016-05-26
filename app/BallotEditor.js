@@ -70,7 +70,7 @@ class BallotEditor extends Component {
     var candidateList = this.refs.candidateList;
     var top = candidateList.firstChild.getBoundingClientRect().top;
     var bottom = candidateList.lastChild.getBoundingClientRect().bottom;
-    candidateList.style.height = bottom - top;
+    candidateList.style.height = (bottom - top) + 'px';
   }
 
   startDrag(e) {
@@ -179,7 +179,7 @@ class BallotEditor extends Component {
     document.body.style.cursor = null;
 
     this.activeElement.classList.remove('dragging');
-    this.activeElement.style.transform = null;
+    this.activeElement.style.transform = '';
     this.activeElement = null;
 
     var order = this.props.order.slice(0);
