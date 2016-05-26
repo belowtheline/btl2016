@@ -70,7 +70,7 @@ class BallotEditor extends Component {
     var candidateList = this.refs.candidateList;
     var top = candidateList.firstChild.getBoundingClientRect().top;
     var bottom = candidateList.lastChild.getBoundingClientRect().bottom;
-    candidateList.style.height = bottom - top;
+    candidateList.style.height = (bottom - top) + 'px';
   }
 
   startDrag(e) {
