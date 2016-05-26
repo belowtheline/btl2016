@@ -179,7 +179,7 @@ class BallotEditor extends Component {
     document.body.style.cursor = null;
 
     this.activeElement.classList.remove('dragging');
-    this.activeElement.style.transform = null;
+    this.activeElement.style.transform = '';
     this.activeElement = null;
 
     var order = this.props.order.slice(0);
