@@ -28,6 +28,22 @@ import { connect } from 'react-redux'
 
 import { updateOrder } from './actions'
 
+function findParentIndex(elem) {
+  var index = -1;
+
+  while (elem) {
+    if ("previousSibling" in elem) {
+      elem = elem.previousSibling;
+      index = index + 1;
+    } else {
+      index = -1;
+      break;
+    }
+  }
+
+  return (index);
+}
+
 class BallotEditor extends Component {
   constructor (props) {
     super(props);
@@ -52,6 +68,7 @@ class BallotEditor extends Component {
     this.boundaries = null;
     this.prevY = 0;
     this.dragTop = 0;
+    this.moving = false;
   }
 
   render() {
@@ -71,6 +88,8 @@ class BallotEditor extends Component {
     var top = candidateList.firstChild.getBoundingClientRect().top;
     var bottom = candidateList.lastChild.getBoundingClientRect().bottom;
     candidateList.style.height = (bottom - top) + 'px';
+    candidateList.addEventListener('mousedown', (e) => { e.preventDefault(); });
+    candidateList.addEventListener('click', (e) => { e.preventDefault(); });
   }
 
   startDrag(e) {
@@ -83,21 +102,17 @@ class BallotEditor extends Component {
       target = target.parentNode;
     }
     var parent = target.parentNode
-    var children = parent.childNodes;
-
-    this.boundaries = [];
-    for (var i = 0; i < children.length; i++) {
-      if (children[i].tagName == 'LI') {
-        var child = children[i];
-        var rect = child.getBoundingClientRect();
-        this.boundaries.push([rect.top + Math.floor((rect.bottom - rect.top) / 2), child]);
-      }
-    }
-
     this.activeElement = target;
-    this.activeElement.classList.add('dragging');
+
+    var index = findParentIndex(this.activeElement);
+    if (index == -1) { return; }
+
     var rect = this.activeElement.getBoundingClientRect();
-    this.dragTop = rect.top - Math.floor((rect.bottom - rect.top) * 0.25);
+    var transformOrigin = getComputedStyle(this.activeElement).transformOrigin;
+    transformOrigin = transformOrigin.split(' ')[1];
+    transformOrigin = parseInt(transformOrigin);
+    this.dragTop = rect.top - transformOrigin - index;
+    this.activeElement.classList.add('dragging');
     this.doMove();
 
     this.moveFrom = this.props.order.indexOf(this.activeElement.dataset.position - 1);
@@ -120,7 +135,12 @@ class BallotEditor extends Component {
 
   doMove() {
     this.activeElement.style.transform =
-      'perspective(250px) translate3d(0px, ' + this.dragTop + 'px, 10px)';
+      'translate3d(0px, ' + this.dragTop + 'px, 10px)';
+  }
+
+  flagMoving() {
+    this.moving = true;
+    setTimeout((() => { this.moving = false; }).bind(this), 210);
   }
 
   doDrag(e) {
@@ -138,35 +158,42 @@ class BallotEditor extends Component {
     this.prevY = clientY;
     this.doMove();
 
-    var parent = this.activeElement.parentNode;
-
-    if (clientY <= this.boundaries[0][0]) {
-      this.moveTo = 0;
-      parent.insertBefore(this.activeElement, parent.firstChild);
+    if (this.moving) {
       return;
     }
 
-    for (var i = 1; i < this.boundaries.length; i++) {
-      var boundary = this.boundaries[i][0];
-      var element = this.boundaries[i][1];
+    var parent = this.activeElement.parentNode;
+    var index = findParentIndex(this.activeElement);
 
-      if (clientY <= boundary) {
-        var ref = null;
-        if (i < this.moveTo) {
-          ref = element;
-        } else if (i > this.moveTo) {
-          ref = element.nextSibling;
-        }
-        if (ref !== null) {
-          parent.insertBefore(this.activeElement, ref);
-          this.moveTo = i;
-        }
+    var lastChild = parent.children[parent.children.length - 1];
+    if (this.activeElement != lastChild) {
+      var lastRect = lastChild.getBoundingClientRect();
+      if (clientY > lastRect.top) {
+        parent.appendChild(this.activeElement);
+        this.moveTo = parent.children.length - 1;
+        this.flagMoving();
         return;
       }
     }
 
-    this.moveTo = this.boundaries.length - 1;
-    parent.appendChild(this.activeElement);
+    for (var i = 0; i < parent.children.length; i++) {
+      var element = parent.children[i];
+      if (element == this.activeElement) {
+        continue;
+      }
+
+      var rect = element.getBoundingClientRect();
+      if (clientY > rect.top + 2 && clientY <= rect.bottom - 2) {
+        var ref = element;
+        if (index < i) {
+          ref = element.nextSibling;
+        }
+        parent.insertBefore(this.activeElement, ref);
+        this.moveTo = i;
+        this.flagMoving();
+        return;
+      }
+    }
   }
 
   stopDrag(e) {

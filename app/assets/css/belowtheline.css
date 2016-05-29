@@ -23,6 +23,7 @@
 
 ul.ballot-editor {
     position: relative;
+    perspective: 250px;
 }
 
 ul.ballot-editor li {
