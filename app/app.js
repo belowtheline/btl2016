@@ -31,10 +31,10 @@ import { Provider } from 'react-redux'
 import ballot from './reducers'
 let store = createStore(ballot, window.STATE_FROM_SERVER)
 
-import BallotEditor from './BallotEditor'
-import BallotViewer from './BallotViewer'
+import RepsEditor from './RepsEditor'
+import RepsViewer from './RepsViewer'
 
 render(
-  <Provider store={store}><div><BallotEditor /><BallotViewer /></div></Provider>,
+  <Provider store={store}><div><RepsEditor /><RepsViewer /></div></Provider>,
   document.getElementById('container')
 );

@@ -44,7 +44,7 @@ function findParentIndex(elem) {
   return (index);
 }
 
-class BallotEditor extends Component {
+class RepsEditor extends Component {
   constructor (props) {
     super(props);
 
@@ -232,4 +232,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(select, mapDispatchToProps)(BallotEditor);
+export default connect(select, mapDispatchToProps)(RepsEditor);

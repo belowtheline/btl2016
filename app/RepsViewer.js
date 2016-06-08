@@ -26,7 +26,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-class BallotViewer extends Component {
+class RepsViewer extends Component {
   render() {
     var order = this.props.order.map((e, i) => { return [e, i]; });
     order.sort((a, b) => { return (a[0] - b[0]); });
@@ -47,4 +47,4 @@ function select(state) {
   }
 }
 
-export default connect(select)(BallotViewer);
+export default connect(select)(RepsViewer);
