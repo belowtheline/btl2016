@@ -29,7 +29,7 @@ import {render} from 'react-dom'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import ballot from './reducers'
-let store = createStore(ballot)
+let store = createStore(ballot, window.STATE_FROM_SERVER)
 
 import BallotEditor from './BallotEditor'
 import BallotViewer from './BallotViewer'

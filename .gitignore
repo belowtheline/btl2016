@@ -1,3 +1,5 @@
 node_modules
 public
+*.pyc
+data
 docker/database/national-midmif-09052016/COM_ELB.*

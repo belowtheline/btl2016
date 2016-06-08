@@ -29,7 +29,7 @@ import {
 } from './actions'
 
 const initialState = {
-  candidates: [
+  reps: [
     { position: 1, name: "BOND, Jane", party: "FIR" },
     { position: 2, name: "STARK, Tina", party: "SEC" },
     { position: 3, name: "WAYNE, Becky", party: "THI" },
@@ -42,12 +42,12 @@ const initialState = {
   order: null
 }
 
-function candidates(state, action) {
+function reps(state, action) {
   switch (action.type) {
     case UPDATE_CANDIDATES:
-      let candidates = action.candidates;
-      candidates.sort((a, b) => { return (a.position - b.position); })
-      return action.candidates
+      let reps = action.reps;
+      reps.sort((a, b) => { return (a.position - b.position); })
+      return action.reps
     default:
       return state
   }
@@ -64,13 +64,15 @@ function order(state, action) {
 
 export default function ballot(state, action) {
   if (typeof(state) === 'undefined') {
-    var state = initialState;
-    state.order = state.candidates.map((e, i) => { return (i); });
-    return state;
+    state = initialState;
+  }
+
+  if (typeof(state.order) === 'undefined') {
+    state.order = state.reps.map((e, i) => { return (i); });
   }
 
   return {
-    candidates: candidates(state.candidates, action),
+    reps: reps(state.reps, action),
     order: order(state.order, action)
   }
 }
