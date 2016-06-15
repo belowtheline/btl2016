@@ -33,8 +33,21 @@ let store = createStore(ballot, window.STATE_FROM_SERVER)
 
 import RepsEditor from './RepsEditor'
 import RepsViewer from './RepsViewer'
+import SenateEditor from './SenateEditor'
 
-render(
-  <Provider store={store}><div><RepsEditor /><RepsViewer /></div></Provider>,
-  document.getElementById('container')
-);
+let editor = document.getElementById('reps-editor');
+if (editor) {
+    render(
+      <Provider store={store}><div><RepsEditor /><RepsViewer /></div></Provider>,
+      editor
+    );
+}
+
+editor = document.getElementById('senate-editor');
+if (editor) {
+    render(
+      <Provider store={store}><div><SenateEditor /></div></Provider>,
+      editor
+    );
+}
+

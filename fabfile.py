@@ -2,15 +2,22 @@ from __future__ import print_function
 
 import json
 import os
+import os.path
 import random
 
-from fabric.api import local
+from fabric.api import local, task
 from faker import Factory
 import jinja2
 
-tmpl_env = jinja2.Environment(loader=jinja2.FileSystemLoader('app/templates'))
+here = os.path.abspath(os.path.split(__file__)[0])
+tmpl_path = os.path.join(here, 'app', 'templates')
+tmpl_env = jinja2.Environment(loader=jinja2.FileSystemLoader(tmpl_path))
 
-def gendata():
+def herepath(path):
+    return os.path.join(here, path)
+
+@task
+def genrandom():
     print("Generating random parties/candidates/ballots...")
 
     fake = Factory.create('en_AU')
@@ -54,20 +61,27 @@ def gendata():
             'candidates': candidates,
         })
 
-    os.makedirs('data')
+    os.makedirs(herepath('data'))
 
     data = {
         'parties': parties,
         'reps': reps_candidates,
         'senate': senate_candidates
     }
-    with open('data/data.json', 'w') as datafile:
+    with open(herepath('data/data.json'), 'w') as datafile:
         json.dump(data, datafile)
 
-def build():
+@task(name="import")
+def importdata():
+    print("Importing AEC data...")
+    local("python import.py")
+
+@task
+def build(division='grayndler'):
     print("Rendering editor test html...")
-    editor_test = tmpl_env.get_template('editor-test.html')
-    with open('data/data.json') as datafile:
+    with open(herepath('data/%s.json' % division)) as datafile:
         data = datafile.read().strip()
-    with open('public/editor-test.html', 'w') as outfile:
-        outfile.write(editor_test.render(data=data))
+    for editor in ['reps-test.html', 'senate-test.html']:
+        editor_test = tmpl_env.get_template(editor)
+        with open(herepath('public/' + editor), 'w') as outfile:
+            outfile.write(editor_test.render(data=data))

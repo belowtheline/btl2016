@@ -24,6 +24,7 @@
 ul.ballot-editor {
     position: relative;
     perspective: 250px;
+    border: 1px solid rgb(240, 240, 240);
 }
 
 ul.ballot-editor li {
@@ -36,6 +37,16 @@ ul.ballot-editor li {
     list-style-type: none;
     margin-bottom: 1px;
     padding: 2px;
+}
+
+#off-ballot-list {
+    float: left;
+    width: 300px;
+}
+
+#ballot-list {
+    float: right;
+    width: 300px;
 }
 
 ul.ballot-viewer {
@@ -58,10 +69,19 @@ ul.ballot-viewer li {
     background-color: rgba(128, 128, 128, 0.5);
 }
 
-#container {
-    width: 300px;
+.placeholder {
+    color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-button {
+.editor-container {
+    width: 650px;
+}
+
+.footer {
     clear: both;
+}
+
+.outlist {
+    visibility: hidden;
 }

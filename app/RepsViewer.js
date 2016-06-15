@@ -31,7 +31,7 @@ class RepsViewer extends Component {
     var order = this.props.order.map((e, i) => { return [e, i]; });
     order.sort((a, b) => { return (a[0] - b[0]); });
     order = order.map((e) => { return (e[1] + 1); });
-    var items = this.props.reps.map((entry, i) => {
+    var items = this.props.candidates.map((entry, i) => {
       return (<li key={i}>
         [{order[i]}] {entry.name}<span className="party">{entry.party}</span>
       </li>);
@@ -42,7 +42,7 @@ class RepsViewer extends Component {
 
 function select(state) {
   return {
-    reps: state.reps,
+    candidates: state.candidates,
     order: state.order
   }
 }

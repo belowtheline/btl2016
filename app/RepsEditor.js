@@ -55,7 +55,7 @@ class RepsEditor extends Component {
     var offset = 0;
     var stride = 105;
 
-    this.props.reps.forEach((c, i) => {
+    this.props.candidates.forEach((c, i) => {
       var rule = "ul.ballot-editor li:not(.dragging):nth-of-type(" + (i + 1) +
           ") { transform: translate3d(0, " + (i * stride) + "%, 0); }";
 
@@ -72,11 +72,10 @@ class RepsEditor extends Component {
   }
 
   render() {
-    console.log(this.props)
-    var reps = this.props.order.map((entry) => {
-      return this.props.reps[entry];
+    var candidates = this.props.order.map((entry) => {
+      return this.props.candidates[entry];
     }, this);
-    var items = reps.map((entry, i) => {
+    var items = candidates.map((entry, i) => {
       return (<li key={entry.position} data-position={entry.position} onMouseDown={this.startDrag.bind(this)} onTouchStart={this.startDrag.bind(this)}>
         {entry.name}<span className="party">{entry.party}</span>
       </li>);
@@ -221,7 +220,7 @@ class RepsEditor extends Component {
 
 function select(state) {
   return {
-    reps: state.reps,
+    candidates: state.candidates,
     order: state.order
   }
 }
