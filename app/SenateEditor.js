@@ -175,6 +175,7 @@ class SenateEditor extends Component {
     }
     this.moveFrom = order.indexOf(this.activeElement.dataset.position - 1);
     this.moveTo = this.moveFrom;
+    this.toOrder = this.fromOrder;
 
     if (parent == this.refs.offBallotList) {
       this.onBallot = false;
@@ -261,10 +262,10 @@ class SenateEditor extends Component {
 
     var ballotList = this.refs.ballotList;
     var blrect = ballotList.getBoundingClientRect();
-    if (clientX > blrect.left && this.onBallot == false && this.changingList == false) {
+    if (clientX > blrect.left && this.toOrder == 'off_order') {
       this.switchActive(this.refs.ballotList);
       this.toOrder = 'order';
-    } else if (clientX < blrect.left && this.onBallot == false && this.changingList == true) {
+    } else if (clientX < blrect.left && this.toOrder == 'order') {
       this.switchActive(this.refs.offBallotList);
       this.toOrder = 'off_order';
     }
