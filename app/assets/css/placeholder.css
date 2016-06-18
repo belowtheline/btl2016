@@ -6,7 +6,7 @@
 a,
 a:focus,
 a:hover {
-  color: #fff;
+  color: #ccf;
 }
 
 /* Custom default button */
@@ -110,7 +110,6 @@ body {
  */
 
 .cover {
-  margin-top: 100px;
   padding: 0 20px;
 }
 .cover .btn-lg {
