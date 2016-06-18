@@ -70,6 +70,8 @@ class SenateEditor extends Component {
     this.boundaries = null;
     this.prevY = 0;
     this.dragTop = 0;
+    this.dragLeft = 0;
+    this.dragOffset = 0;
     this.moving = false;
   }
 
@@ -153,15 +155,6 @@ class SenateEditor extends Component {
     var index = findParentIndex(this.activeElement);
     if (index == -1) { return; }
 
-    var rect = this.activeElement.getBoundingClientRect();
-    var transformOrigin = getComputedStyle(this.activeElement).transformOrigin;
-    transformOrigin = transformOrigin.split(' ')[1];
-    transformOrigin = parseInt(transformOrigin);
-    this.dragTop = rect.top - transformOrigin - index;
-    this.dragLeft = rect.left;
-    this.activeElement.classList.add('dragging');
-    this.doMove();
-
     let order = this.props.atl_order;
     if (!this.props.senate_atl) {
       order = this.props.btl_order;
@@ -176,6 +169,18 @@ class SenateEditor extends Component {
     this.moveFrom = order.indexOf(this.activeElement.dataset.position - 1);
     this.moveTo = this.moveFrom;
     this.toOrder = this.fromOrder;
+
+    var rect = this.activeElement.getBoundingClientRect();
+    // var transformOrigin = getComputedStyle(this.activeElement).transformOrigin;
+    // transformOrigin = transformOrigin.split(' ')[1];
+    // transformOrigin = parseInt(transformOrigin);
+    // this.dragTop = rect.top - transformOrigin - index;
+    // this.dragLeft = rect.left;
+    this.dragTop = rect.top;
+    this.dragLeft = rect.left;
+    this.activeElement.classList.add('dragging');
+    this.setOrigin();
+    this.doMove();
 
     if (parent == this.refs.offBallotList) {
       this.onBallot = false;
@@ -200,12 +205,24 @@ class SenateEditor extends Component {
     document.addEventListener('touchcancel', this.stopDrag.bind(this), false);
     document.body.style.cursor = 'ns-resize';
 
+    console.log(this.activeElement.getBoundingClientRect().left);
+    setTimeout(() => { console.log(this.activeElement.getBoundingClientRect().left); }, 100);
     e.preventDefault();
+  }
+
+  setOrigin() {
+    if (this.toOrder == 'off_order') {
+      this.dragOffset = 0;
+    } else {
+      let ballotRect = this.refs.ballotList.getBoundingClientRect();
+      let offBallotRect = this.refs.offBallotList.getBoundingClientRect();
+      this.dragOffset = ballotRect.left - offBallotRect.left;
+    }
   }
 
   doMove() {
     this.activeElement.style.transform =
-      'translate3d(' + this.dragLeft + 'px, ' + this.dragTop + 'px, 10px)';
+      'translate3d(' + (this.dragLeft - this.dragOffset) + 'px, ' + this.dragTop + 'px, 10px)';
   }
 
   flagMoving() {
@@ -215,24 +232,34 @@ class SenateEditor extends Component {
 
   switchActive(list) {
     let identifier = this.activeElement.dataset.identifier;
-    let companion = null;
+    let newActive = null;
     for (let i = 0; i < list.children.length; i++) {
       let child = list.children[i];
       if (child.dataset.identifier == identifier) {
-        companion = child;
+        newActive = child;
         break;
       }
     }
 
-    this.activeElement.classList.remove('dragging');
-    this.activeElement.classList.remove('inlist');
-    this.activeElement.classList.add('outlist');
-    this.activeElement.style.transform = '';
-    this.activeElement = companion;
-    this.activeElement.classList.remove('outlist');
-    this.activeElement.classList.add('dragging');
-    this.activeElement.classList.add('inlist');
+    let oldActive = this.activeElement;
+    let oldLeft = oldActive.getBoundingClientRect().left
+
+    newActive.classList.add('dragging');
+    this.activeElement = newActive;
+    this.setOrigin();
     this.doMove();
+    setTimeout(() => {
+        newActive.classList.remove('outlist');
+        console.log(newActive.getBoundingClientRect().left - oldLeft);
+    }, 5);
+
+    oldActive.style.visibility = 'hidden';
+    oldActive.classList.add('outlist');
+    setTimeout(() => {
+      oldActive.style.transform = '';
+      oldActive.classList.remove('dragging');
+      oldActive.style.visibility = '';
+    }, 5);
   }
 
   doDrag(e) {
@@ -254,6 +281,7 @@ class SenateEditor extends Component {
     this.dragTop += clientY - this.prevY;
     this.prevX = clientX;
     this.prevY = clientY;
+    this.activeElement.classList.remove('inlist');
     this.doMove();
 
     if (this.moving) {
@@ -263,11 +291,18 @@ class SenateEditor extends Component {
     var ballotList = this.refs.ballotList;
     var blrect = ballotList.getBoundingClientRect();
     if (clientX > blrect.left && this.toOrder == 'off_order') {
-      this.switchActive(this.refs.ballotList);
       this.toOrder = 'order';
+      this.switchActive(this.refs.ballotList);
+
+      // let leftOffset = this.refs.ballotList.getBoundingClientRect().left -
+      //   this.refs.offBallotList.getBoundingClientRect().left;
+      // this.dragLeft -= leftOffset;
     } else if (clientX < blrect.left && this.toOrder == 'order') {
-      this.switchActive(this.refs.offBallotList);
       this.toOrder = 'off_order';
+      this.switchActive(this.refs.offBallotList);
+      // let leftOffset = this.refs.ballotList.getBoundingClientRect().left -
+      //   this.refs.offBallotList.getBoundingClientRect().left;
+      // this.dragLeft += leftOffset;
     }
 
     var parent = this.activeElement.parentNode;
@@ -320,7 +355,9 @@ class SenateEditor extends Component {
     document.body.style.cursor = null;
 
     this.activeElement.classList.remove('dragging');
+    this.activeElement.classList.add('inlist');
     this.activeElement.style.transform = '';
+    this.activeElement.style.transformOrigin = '';
     this.activeElement = null;
 
     let order = null;
